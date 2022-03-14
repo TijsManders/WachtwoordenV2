@@ -70,9 +70,11 @@ func generator() string {
 		random := rand.Intn(len(AlleTekens))
 		Wachtwoord.WriteString(string(AlleTekens[random]))
 	}
-	Runen := []rune(Wachtwoord.String())
-	rand.Shuffle(len(Runen), func(i, j int) {
-		Runen[i], Runen[j] = Runen[j], Runen[i]
+
+	Shuffle := strings.Split(Wachtwoord.String(), "")
+	rand.Shuffle(len(Shuffle), func(i, j int) {
+		Shuffle[i], Shuffle[j] = Shuffle[j], Shuffle[i]
 	})
-	return string(Runen)
+	Hussel := strings.Join(Shuffle, "")
+	return Hussel
 }
