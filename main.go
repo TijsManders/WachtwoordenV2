@@ -1,33 +1,48 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"math/rand"
 	"strings"
 	"time"
 )
 
-func main() {
-
-	fmt.Println(generator())
-}
-
 var (
-	KleineLetters    = "abcdedfghijklmnopqrst"
-	GroteLetters     = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-	Symbolen         = "!@#$%&*"
-	Nummers          = "0123456789"
-	AlleTekens       = KleineLetters + GroteLetters + Symbolen + Nummers
-	Lengte           = 8
-	MinKleineLetters = 1
-	MinGroteLetters  = 1
-	MinimaleSymbolen = 1
-	MinNummers       = 1
+	KleineLetters    string
+	GroteLetters     string
+	Symbolen         string
+	Nummers          string
+	Aantal           int
+	MinKleineLetters int
+	MinGroteLetters  int
+	MinSymbolen      int
+	MinNummers       int
 )
 
-func generator() string {
+func init() {
 	rand.Seed(time.Now().Unix())
+	flag.StringVar(&KleineLetters, "WKL", "abcdedfghijklmnopqrstuvwxyz", "Welke kleine letters gebruikt worden")
+	flag.StringVar(&GroteLetters, "WGL", "ABCDEFGHIJKLMNOPQRSTUVWXYZ", "Welke grote letters gebruikt worden")
+	flag.StringVar(&Symbolen, "WS", "!@#$%&*", "Welke symbolen gebruikt worden")
+	flag.StringVar(&Nummers, "WN", "0123456789", "Welke nummers gebruikt worden")
+	flag.IntVar(&Aantal, "A", 8, "De lengte van het wachtwoord (aantal tekens)")
+	flag.IntVar(&MinKleineLetters, "KL", 1, "Minimale hoeveelheid kleine letters")
+	flag.IntVar(&MinGroteLetters, "GL", 1, "Minimale hoeveelheid grote letters")
+	flag.IntVar(&MinSymbolen, "S", 1, "Minimale hoeveelheid symbolen")
+	flag.IntVar(&MinNummers, "N", 1, "Minimale hoeveelheid nummers")
+	flag.Parse()
+}
 
+func main() {
+
+	GegenereerdWachtwoord := generator()
+	fmt.Println(GegenereerdWachtwoord)
+}
+
+func generator() string {
+
+	AlleTekens := KleineLetters + GroteLetters + Symbolen + Nummers
 	var Wachtwoord strings.Builder
 
 	for i := 0; i < MinKleineLetters; i++ {
@@ -40,7 +55,7 @@ func generator() string {
 		Wachtwoord.WriteString(string(GroteLetters[random]))
 	}
 
-	for i := 0; i < MinimaleSymbolen; i++ {
+	for i := 0; i < MinSymbolen; i++ {
 		random := rand.Intn(len(Symbolen))
 		Wachtwoord.WriteString(string(Symbolen[random]))
 	}
@@ -50,10 +65,14 @@ func generator() string {
 		Wachtwoord.WriteString(string(Nummers[random]))
 	}
 
-	Overgebleven := Lengte - MinKleineLetters - MinGroteLetters - MinimaleSymbolen - MinNummers
+	Overgebleven := Aantal - MinKleineLetters - MinGroteLetters - MinSymbolen - MinNummers
 	for i := 0; i < Overgebleven; i++ {
 		random := rand.Intn(len(AlleTekens))
 		Wachtwoord.WriteString(string(AlleTekens[random]))
 	}
-	return Wachtwoord.String()
+	Runen := []rune(Wachtwoord.String())
+	rand.Shuffle(len(Runen), func(i, j int) {
+		Runen[i], Runen[j] = Runen[j], Runen[i]
+	})
+	return string(Runen)
 }
